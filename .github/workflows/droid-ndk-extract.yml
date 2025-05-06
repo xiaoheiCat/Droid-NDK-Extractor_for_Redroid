@@ -1,52 +1,63 @@
-name: Droid-NDK-Extractor Workflow
+name: Extract and Modify NDK Bridge Tar
 
 on:
   workflow_dispatch:
 
 jobs:
-  extract-and-modify-ndk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Install required dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sleuthkit p7zip-full git binwalk
+        sudo apt-get install -y python3-pip
+        sudo pip3 install binwalk
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sleuthkit p7zip binwalk git
+    - name: Clone Droid-NDK-Extractor repository
+      uses: actions/checkout@v3
+      with:
+        repository: your-username/Droid-NDK-Extractor  # 替换为你的仓库地址
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Clone Droid-NDK-Extractor repository
-        run: |
-          cd ~
-          git clone https://github.com/xiaoheiCat/Droid-NDK-Extractor_for_Redroid.git
-          cd Droid-NDK-Extractor
-          chmod +x android-extract-ndk.sh
+    - name: Make the extraction script executable
+      run: |
+        cd Droid-NDK-Extractor
+        chmod +x android-extract-ndk.sh
 
-      - name: Extract native-bridge.tar
-        run: |
-          cd ~/Droid-NDK-Extractor
-          ./android-extract-ndk.sh x86_64
+    - name: Run the extraction script for x86_64 architecture
+      run: |
+        cd Droid-NDK-Extractor
+        ./android-extract-ndk.sh x86_64
 
-      - name: Modify permissions and re-compress
-        run: |
-          cd ~/Droid-NDK-Extractor/working/extracted/
-          mkdir native-bridge
-          cd native-bridge
-          tar -xpf ../native-bridge.tar
-          chmod 0644 system/etc/init/ndk_translation_arm64.rc
-          chmod 0755 system/bin/arm
-          chmod 0755 system/bin/arm64
-          chmod 0755 system/lib/arm
-          chmod 0755 system/lib64/arm64
-          chmod 0644 system/etc/binfmt_misc/*
-          tar -cpf native-bridge.tar system
-          mv native-bridge.tar ..
-          cd ..
-          rm -r native-bridge
+    - name: Create working directory and extract the generated tar
+      run: |
+        mkdir -p Droid-NDK-Extractor/working/extracted/native-bridge
+        cd Droid-NDK-Extractor/working/extracted/native-bridge
+        tar -xpf ../native-bridge.tar
 
-      - name: Upload modified archive
-        uses: actions/upload-artifact@v3
-        with:
-          name: modified-native-bridge
-          path: ~/Droid-NDK-Extractor/working/extracted/native-bridge.tar    
+    - name: Fix file and directory permissions
+      run: |
+        cd Droid-NDK-Extractor/working/extracted/native-bridge
+        chmod 0644 system/etc/init/ndk_translation_arm64.rc
+        chmod 0755 system/bin/arm
+        chmod 0755 system/bin/arm64
+        chmod 0755 system/lib/arm
+        chmod 0755 system/lib64/arm64
+        chmod 0644 system/etc/binfmt_misc/*
+
+    - name: Repack the tar file with fixed permissions
+      run: |
+        cd Droid-NDK-Extractor/working/extracted/native-bridge
+        tar -cpf ../native-bridge-fixed.tar system
+
+    - name: Clean up temporary directory
+      run: |
+        rm -rf Droid-NDK-Extractor/working/extracted/native-bridge
+
+    - name: Upload the modified tar file as an artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: native-bridge-fixed.tar
+        path: Droid-NDK-Extractor/working/extracted/native-bridge-fixed.tar
