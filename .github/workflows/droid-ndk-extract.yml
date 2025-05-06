@@ -57,7 +57,7 @@ jobs:
         rm -rf Droid-NDK-Extractor/working/extracted/native-bridge
 
     - name: Upload the modified tar file as an artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: native-bridge-fixed.tar
         path: Droid-NDK-Extractor/working/extracted/native-bridge-fixed.tar
