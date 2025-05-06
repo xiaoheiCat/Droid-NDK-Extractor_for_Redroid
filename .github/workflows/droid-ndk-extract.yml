@@ -18,7 +18,7 @@ jobs:
     - name: Clone Droid-NDK-Extractor repository
       uses: actions/checkout@v3
       with:
-        repository: xiaoheiCat/Droid-NDK-Extractor_for_Redroid
+        repository: ${{ github.repository }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Make the extraction script executable
@@ -61,4 +61,3 @@ jobs:
       with:
         name: native-bridge-fixed.tar
         path: Droid-NDK-Extractor/working/extracted/native-bridge-fixed.tar
-        token: ${{ secrets.GITHUB_TOKEN }}
