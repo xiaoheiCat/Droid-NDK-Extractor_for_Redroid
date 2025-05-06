@@ -18,7 +18,7 @@ jobs:
     - name: Clone Droid-NDK-Extractor repository
       uses: actions/checkout@v3
       with:
-        repository: your-username/Droid-NDK-Extractor  # 替换为你的仓库地址
+        repository: xiaoheiCat/Droid-NDK-Extractor_for_Redroid
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Make the extraction script executable
