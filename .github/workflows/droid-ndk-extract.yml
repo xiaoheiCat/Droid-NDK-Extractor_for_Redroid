@@ -16,7 +16,7 @@ jobs:
         sudo pip3 install binwalk
 
     - name: Clone Droid-NDK-Extractor repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: xiaoheiCat/Droid-NDK-Extractor_for_Redroid
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +57,8 @@ jobs:
         rm -rf Droid-NDK-Extractor/working/extracted/native-bridge
 
     - name: Upload the modified tar file as an artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: native-bridge-fixed.tar
         path: Droid-NDK-Extractor/working/extracted/native-bridge-fixed.tar
+        token: ${{ secrets.GITHUB_TOKEN }}
